@@ -7,4 +7,4 @@ export interface FormElement {
   required: boolean;
   options?: string[]; 
   optionsString?: string;
-}
+} 

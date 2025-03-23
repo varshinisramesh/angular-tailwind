@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
   fieldGroups: FieldGroup[] = [];
   selectedGroup!: FieldGroup | null;
   selectedElement!: FormElement | null;
-  optionsString: string = '';
+  optionsString: string = ''; 
   searchText: string = '';
   newGroupName: string = '';
 
@@ -46,21 +46,27 @@ export class AppComponent implements OnInit {
     this.selectedGroup = group;
     this.selectedElement = null;
   }
-
   addElement(elementTemplate: any) {
     if (!this.selectedGroup) {
       alert('Select a Field Group first!');
       return;
     }
+  
     const newElement: FormElement = {
       id: Date.now().toString(),
       type: elementTemplate.type,
       name: elementTemplate.name,
       required: false,
     };
+  
+    if (newElement.type === 'dropdown' || newElement.type === 'multi-select') {
+      newElement.options = [];
+    }
+  
     this.selectedGroup.elements.push(newElement);
     this.save();
   }
+  
 
 
   selectElement(element: FormElement) {
@@ -87,10 +93,20 @@ export class AppComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = () => {
       this.fieldGroups = JSON.parse(reader.result as string);
+
+      this.fieldGroups.forEach(group => {
+        group.elements.forEach(el => {
+          if ((el.type === 'dropdown' || el.type === 'multi-select') && !el.options) {
+            el.options = [];
+          }
+        });
+      });
+  
       this.save();
     };
     reader.readAsText(file);
   }
+  
   
   
 
