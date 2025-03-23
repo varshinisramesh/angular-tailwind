@@ -77,7 +77,7 @@
 <button class="mt-4 bg-blue-500 text-white p-2 rounded" (click)="saveEditedElement()">Save Changes</button>
 </div>
 
-
+<!-- RIGHT DRAWER - Live Preview -->
 <div *ngIf="selectedGroup" class="mt-6 p-4 bg-green-50 rounded shadow">
 <h3 class="font-semibold mb-4">Live Preview</h3>
 <form>
@@ -93,9 +93,9 @@
     <input *ngIf="element.type === 'date'" type="date" class="border p-2 w-full">
 
     <select *ngIf="element.type === 'dropdown'" class="border p-2 w-full">
-      <option *ngFor="let option of element.options">{{ option }}</option>
+      <option *ngFor="let option of (element.options || [])">{{ option }}</option>
     </select>
-
+    
     <input *ngIf="element.type === 'file'" type="file" class="border p-2 w-full">
   </div>
 </form>
