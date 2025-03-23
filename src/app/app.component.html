@@ -1,0 +1,102 @@
+<div class="flex h-screen bg-gray-50">
+<!-- Left Pane - Field Groups -->
+<div class="w-1/5 p-4 border-r bg-white">
+  <h2 class="text-lg font-semibold">Field Groups</h2>
+  <input type="text" placeholder="Enter Group Name"
+  [(ngModel)]="newGroupName"
+  class="border p-2 w-full mb-2"/>
+  <button class="text-blue-500 my-2" (click)="addGroup(newGroupName)">➕ Add Group</button>
+  <div *ngFor="let group of fieldGroups" 
+       (click)="selectGroup(group)" 
+       [class.bg-blue-100]="selectedGroup?.id === group.id"
+       class="cursor-pointer p-2 rounded hover:bg-blue-50">
+    {{ group.name }}
+  </div>
+</div>
+
+<!-- Middle Pane - Selected Group & Form Elements -->
+<div class="w-3/5 p-6 bg-gray-50">
+  <div *ngIf="selectedGroup">
+    <h3 class="text-xl font-semibold mb-2">{{ selectedGroup.name }}</h3>
+    <p class="mb-4">{{ selectedGroup.description || 'Add description ...' }}</p>
+
+    
+  <div cdkDropList (cdkDropListDropped)="drop($event)">
+  <div *ngFor="let element of selectedGroup.elements" cdkDrag
+  class="p-2 border mb-2 bg-white cursor-move flex justify-between items-center">
+    <span>{{ element.name }}</span>
+    <div class="flex gap-2">
+    <button (click)="selectElement(element)" class="text-blue-500 hover:text-blue-700">
+      ✏️
+    </button>
+    <button (click)="deleteElement(element.id)" class="text-red-500 hover:text-red-700">
+      🗑️
+    </button>
+  </div>
+  </div>
+</div>
+   
+  </div>
+  <div *ngIf="!selectedGroup" class="text-gray-500">Select a field group to edit form elements</div>
+</div>
+
+<!-- RIGHT PANE - Available Elements -->
+<div class="w-1/4 p-4 border-l bg-white">
+  <h2 class="text-lg font-semibold">Elements</h2>
+  <div *ngFor="let element of availableElements"
+       [class.opacity-50]="!selectedGroup"
+       [class.cursor-not-allowed]="!selectedGroup"
+       class="p-3 bg-white border rounded mb-2 cursor-pointer hover:bg-gray-100"
+       (click)="addElement(element)">
+    {{ element.name }}
+  </div>
+  <button class="bg-blue-500 text-white p-2" (click)="downloadJSON()">Export JSON</button>
+  <input type="file" (change)="onFileUpload($event)">
+
+</div>
+
+
+
+<!-- RIGHT DRAWER - Field Properties -->
+<div *ngIf="selectedElement" class="p-4 bg-gray-100 border rounded mt-4">
+<h3 class="font-semibold mb-4">Edit Field Properties</h3>
+
+<input class="border w-full p-2 mb-2" [(ngModel)]="selectedElement.name" placeholder="Field Name (e.g., 'Email')" />
+<input class="border w-full p-2 mb-2" [(ngModel)]="selectedElement.description" placeholder="Description (optional)" />
+<input class="border w-full p-2 mb-2" [(ngModel)]="selectedElement.placeholder" placeholder="Placeholder (e.g., 'Enter your email')" />
+
+<label class="flex items-center">
+  <input type="checkbox" [(ngModel)]="selectedElement.required" class="mr-2" /> Required
+</label>
+
+<div *ngIf="selectedElement.type === 'dropdown' || selectedElement.type === 'multi-select'">
+  <label class="mt-4 block font-semibold">Options (comma separated)</label>
+  <input class="border w-full p-2" [(ngModel)]="selectedElement.optionsString" placeholder="Option1, Option2, Option3" (change)="updateOptions()" />
+</div>
+
+<button class="mt-4 bg-blue-500 text-white p-2 rounded" (click)="saveEditedElement()">Save Changes</button>
+</div>
+
+
+<div *ngIf="selectedGroup" class="mt-6 p-4 bg-green-50 rounded shadow">
+<h3 class="font-semibold mb-4">Live Preview</h3>
+<form>
+  <div *ngFor="let element of selectedGroup.elements" class="mb-4">
+    <label class="block font-medium">{{ element.name }}</label>
+
+    <input *ngIf="element.type === 'text'" type="text" [placeholder]="element.placeholder"
+           class="border p-2 w-full" [required]="element.required">
+
+    <textarea *ngIf="element.type === 'textarea'" [placeholder]="element.placeholder"
+              class="border p-2 w-full"></textarea>
+
+    <input *ngIf="element.type === 'date'" type="date" class="border p-2 w-full">
+
+    <select *ngIf="element.type === 'dropdown'" class="border p-2 w-full">
+      <option *ngFor="let option of element.options">{{ option }}</option>
+    </select>
+
+    <input *ngIf="element.type === 'file'" type="file" class="border p-2 w-full">
+  </div>
+</form>
+</div>
